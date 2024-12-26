@@ -1,5 +1,6 @@
 import { Cover } from '@ha/Cover';
 import { IMQTTConnection } from '@mqtt/IMQTTConnection';
+import { arrayEquals } from '@utils/arrayEquals';
 import { BLEController } from 'BLE/BLEController';
 import { buildEntityConfig } from 'Common/buildEntityConfig';
 import { Commands } from './Commands';
@@ -11,9 +12,6 @@ interface MotorState {
   feet?: boolean;
   canceled?: boolean;
 }
-
-const arrayEquals = (arr1: number[], arr2: number[]) =>
-  arr1.length === arr2.length && arr1.every((v, i) => v === arr2[i]);
 
 export const setupMotorEntities = (
   mqtt: IMQTTConnection,

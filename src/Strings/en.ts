@@ -92,6 +92,9 @@ const strings = {
   MotorLegs: 'Legs',
   MotorFeet: 'Feet',
   MotorAll: 'All',
+  MotorTilt: 'Tilt',
+  MotorLumbar: 'Lumbar',
+  MotorNeck: 'Neck',
 };
 
 export default strings;
