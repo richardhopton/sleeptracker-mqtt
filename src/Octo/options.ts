@@ -1,20 +1,19 @@
 import { getRootOptions } from '@utils/options';
 
-export interface LinakDevice {
+export interface OctoDevice {
   friendlyName: string;
   name: string;
-  motorCount?: number;
-  hasMassage?: boolean;
+  pin?: string;
 }
 
 interface OptionsJson {
-  linakDevices: LinakDevice[];
+  octoDevices: OctoDevice[];
 }
 
 const options: OptionsJson = getRootOptions();
 
 export const getDevices = () => {
-  const devices = options.linakDevices;
+  const devices = options.octoDevices;
   if (Array.isArray(devices)) {
     return devices;
   }

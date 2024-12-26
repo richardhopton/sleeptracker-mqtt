@@ -9,16 +9,14 @@ interface DebugEntities {
 
 export const setupDebugEntities = (
   mqtt: IMQTTConnection,
-  { entities, deviceData, writeCommand }: IController<number[]>
+  { cache, deviceData, writeCommand }: IController<number[]>
 ) => {
-  const cache = entities as DebugEntities;
-
-  if (!cache.refreshState) {
-    cache.refreshState = new Button(mqtt, deviceData, { description: 'Refresh State' }, async () => {
-      await writeCommand(Commands.GetState);
-    });
-  }
-  cache.refreshState.setOnline();
-
   void writeCommand(Commands.GetState);
+
+  let { refreshState } = cache as DebugEntities;
+  if (refreshState) return;
+
+  cache.refreshState = new Button(mqtt, deviceData, { description: 'Refresh State' }, async () => {
+    await writeCommand(Commands.GetState);
+  }).setOnline();
 };

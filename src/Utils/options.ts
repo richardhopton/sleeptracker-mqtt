@@ -12,7 +12,8 @@ export type Type =
   | 'leggettplatt'
   | 'logicdata'
   | 'okimat'
-  | 'keeson';
+  | 'keeson'
+  | 'octo';
 
 interface OptionsJson {
   type: Type;

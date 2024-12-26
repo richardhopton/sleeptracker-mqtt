@@ -8,11 +8,12 @@ import { IAvailable } from './IAvailable';
 
 const ONLINE = 'online';
 const OFFLINE = 'offline';
-type ComponentType = 'button' | EntityWithStateComponentType;
+type ComponentType = 'button' | 'cover' | EntityWithStateComponentType;
 
 export type EntityConfig = {
   description: string;
   category?: string;
+  icon?: string;
 };
 
 export class Entity implements IAvailable {
@@ -56,6 +57,7 @@ export class Entity implements IAvailable {
       payload_available: ONLINE,
       payload_not_available: OFFLINE,
       ...(this.entityConfig.category ? { entity_category: this.entityConfig.category } : {}),
+      ...(this.entityConfig.icon ? { icon: this.entityConfig.icon } : {}),
     };
   }
 

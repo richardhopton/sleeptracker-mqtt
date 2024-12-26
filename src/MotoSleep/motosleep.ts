@@ -1,13 +1,21 @@
+import { Cover } from '@ha/Cover';
 import { IMQTTConnection } from '@mqtt/IMQTTConnection';
+import { arrayEquals } from '@utils/arrayEquals';
 import { buildDictionary } from '@utils/buildDictionary';
 import { logError, logInfo } from '@utils/logger';
 import { BLEController } from 'BLE/BLEController';
 import { setupDeviceInfoSensor } from 'BLE/setupDeviceInfoSensor';
 import { buildCommandButton } from 'Common/buildCommandButton';
+import { buildEntityConfig } from 'Common/buildEntityConfig';
 import { buildMQTTDeviceData } from 'Common/buildMQTTDeviceData';
 import { IESPConnection } from 'ESPHome/IESPConnection';
 import { buildCommands } from './CommandBuilder';
 import { getDevices } from './options';
+
+interface MotorState {
+  command?: number[];
+  canceled?: boolean;
+}
 
 export const motosleep = async (mqtt: IMQTTConnection, esphome: IESPConnection) => {
   const devices = getDevices();
@@ -49,8 +57,45 @@ export const motosleep = async (mqtt: IMQTTConnection, esphome: IESPConnection) 
     );
     logInfo('[MotoSleep] Setting up entities for device:', name);
     const commands = buildCommands(name);
-    for (const { name, command, category } of commands.filter((c) => !c.repeat)) {
+    for (const { name, command, category } of commands.filter((c) => c.type == 'simple')) {
       buildCommandButton('MotoSleep', mqtt, controller, name, command, category);
+    }
+
+    const { cache, writeCommand, cancelCommands } = controller;
+    if (!cache.motorState) cache.motorState = {};
+
+    const sendMotorControlCommand = async (command: number[]) => {
+      const motorState = cache.motorState as MotorState;
+      motorState.canceled = true;
+      await cancelCommands();
+      motorState.canceled = false;
+
+      if (!arrayEquals(command, [])) {
+        await writeCommand(command, 5_000, 200);
+        if (motorState.canceled) return;
+        cache.motorState = {};
+      }
+    };
+    for (const {
+      name,
+      commands: { up, down },
+    } of commands.filter((c) => c.type == 'complex')) {
+      const commandToCommand = (command: string) => {
+        switch (command) {
+          case 'OPEN':
+            return up;
+          case 'CLOSE':
+            return down;
+          default:
+            return [];
+        }
+      };
+      new Cover(mqtt, deviceData, buildEntityConfig(name), async (command) => {
+        const motorState = cache.motorState as MotorState;
+        const originalCommand = motorState.command || [];
+        const newCommand = (motorState.command = commandToCommand(command));
+        if (!arrayEquals(originalCommand, newCommand)) await sendMotorControlCommand(newCommand);
+      }).setOnline();
     }
 
     const deviceInfo = await bleDevice.getDeviceInfo();

@@ -10,6 +10,7 @@ import { leggettplatt } from 'LeggettPlatt/leggettplatt';
 import { linak } from 'Linak/linak';
 import { logicdata } from 'Logicdata/logicdata';
 import { motosleep } from 'MotoSleep/motosleep';
+import { octo } from 'Octo/octo';
 import { okimat } from 'Okimat/okimat';
 import { reverie } from 'Reverie/reverie';
 import { richmat } from 'Richmat/richmat';
@@ -69,6 +70,8 @@ const start = async () => {
       return void (await okimat(mqtt, esphome));
     case 'keeson':
       return void (await keeson(mqtt, esphome));
+    case 'octo':
+      return void (await octo(mqtt, esphome));
   }
 };
 void start();

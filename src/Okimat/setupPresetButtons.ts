@@ -1,14 +1,14 @@
 import { IMQTTConnection } from '@mqtt/IMQTTConnection';
 import { IController } from 'Common/IController';
 import { buildCommandButton } from 'Common/buildCommandButton';
-import { buildCommandSwitch } from 'Common/buildCommandSwitch';
+import { buildRepeatingCommandSwitch } from 'Common/buildRepeatingCommandSwitch';
 import { Remote } from './Remote';
 
 export const setupPresetButtons = (mqtt: IMQTTConnection, controller: IController<number>, remote: Remote) => {
   const flatCommand = remote.commands.Flat;
   if (flatCommand) {
     if (typeof flatCommand === 'number')
-      buildCommandSwitch('Okimat', mqtt, controller, 'PresetFlat', flatCommand, undefined, 10_000, 200);
+      buildRepeatingCommandSwitch('Okimat', mqtt, controller, 'PresetFlat', flatCommand, undefined, 10_000, 200);
   }
   const memory1Command = remote.commands.Memory1;
   if (memory1Command) {

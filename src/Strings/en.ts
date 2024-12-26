@@ -70,7 +70,7 @@ const strings = {
   AngleBack: 'Back Angle',
   AngleFoot: 'Foot Angle',
   AngleLeg: 'Leg Angle',
-  SafetyLights: 'SafetyLights',
+  SafetyLights: 'Safety Lights',
   SafetyLightsToggle: 'Toggle Safety Lights',
   UnderBedLightsToggle: 'Toggle Under Bed Lights',
   UnderBedLights: 'Under Bed Lights',
@@ -87,6 +87,14 @@ const strings = {
   Low: 'Low',
   Medium: 'Medium',
   High: 'High',
+  MotorHead: 'Head',
+  MotorBack: 'Back',
+  MotorLegs: 'Legs',
+  MotorFeet: 'Feet',
+  MotorAll: 'All',
+  MotorTilt: 'Tilt',
+  MotorLumbar: 'Lumbar',
+  MotorNeck: 'Neck',
 };
 
 export default strings;

@@ -46,4 +46,15 @@ export const supportedRemotes: Dictionary<Remote> = {
       UBL: 0x20000,
     },
   },
+  '82417': {
+    name: 'RF TOPLINE',
+    commands: {
+      Flat: 0x000000AA,
+      BackDown: 0x2,
+      BackUp: 0x1,
+      LegsDown: 0x8,
+      LegsUp: 0x4,
+      UBL: 0x20000,
+    },
+  },
 };

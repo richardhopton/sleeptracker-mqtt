@@ -22,27 +22,23 @@ interface PresetButtonEntities {
 
 export const setupPresetButtons = (
   mqtt: IMQTTConnection,
-  { entities, deviceData, writeCommand }: IController<number[]>
+  { cache, deviceData, writeCommand }: IController<number[]>
 ) => {
-  const cache = entities as PresetButtonEntities;
-
   const buildCachedButton = (
     key: keyof PresetButtonEntities,
     name: StringsKey,
     command: number[],
     { category, repeat }: { category?: string; repeat?: true } = {}
   ) => {
-    let button = cache[key];
-    if (!button) {
-      button = cache[key] = new Button(mqtt, deviceData, buildEntityConfig(name, category), async () => {
-        try {
-          await writeCommand(command, repeat && 30_000, repeat && 300);
-        } catch (e) {
-          logError(`[Linak] Failed to write '${getString(name)}'`, e);
-        }
-      });
-    }
-    button.setOnline();
+    if (cache[key]) return;
+
+    cache[key] = new Button(mqtt, deviceData, buildEntityConfig(name, category), async () => {
+      try {
+        await writeCommand(command, repeat && 30_000, repeat && 300);
+      } catch (e) {
+        logError(`[Linak] Failed to write '${getString(name)}'`, e);
+      }
+    }).setOnline();
   };
 
   buildCachedButton('presetMemory1', 'PresetMemory1', Commands.PresetMemory1, { repeat: true });

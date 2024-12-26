@@ -1,5 +1,4 @@
 import { IDeviceData } from '@ha/IDeviceData';
-import { Entity } from '@ha/base/Entity';
 import { Dictionary } from '@utils/Dictionary';
 import { Timer } from '@utils/Timer';
 import { intToBytes } from '@utils/intToBytes';
@@ -38,7 +37,7 @@ const commandPayload = (id: number, command: number) => {
 };
 
 export class Controller implements IController<number> {
-  entities: Dictionary<Entity> = {};
+  cache: Dictionary<Object> = {};
   private timer?: Timer = undefined;
 
   constructor(public deviceData: IDeviceData, public device: Device, public user: Credentials) {}

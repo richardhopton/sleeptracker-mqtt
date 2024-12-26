@@ -1,13 +1,12 @@
 import { IDeviceData } from '@ha/IDeviceData';
-import { Entity } from '@ha/base/Entity';
 import { Dictionary } from '@utils/Dictionary';
 
-export interface IDeviceEntityCache {
-  entities: Dictionary<Entity>;
+export interface IDeviceCache {
+  cache: Dictionary<Object>;
   deviceData: IDeviceData;
 }
 
-export interface IController<TCommand> extends IDeviceEntityCache {
+export interface IController<TCommand> extends IDeviceCache {
   writeCommand: (command: TCommand, duration?: number, frequency?: number) => Promise<void>;
   writeCommands: (commands: TCommand[], duration?: number, frequency?: number) => Promise<void>;
   cancelCommands: () => Promise<void>;

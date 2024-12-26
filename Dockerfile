@@ -33,8 +33,8 @@ WORKDIR /smartbed-mqtt
 COPY run.sh /smartbed-mqtt/
 RUN chmod a+x run.sh
 
-COPY --from=0 /smartbed-mqtt/dist/tsc/ /smartbed-mqtt/
 COPY --from=0 /smartbed-mqtt/node_modules /smartbed-mqtt/node_modules
+COPY --from=0 /smartbed-mqtt/dist/tsc/ /smartbed-mqtt/
 
 ENTRYPOINT [ "/smartbed-mqtt/run.sh" ]
 #ENTRYPOINT [ "node", "index.js" ]

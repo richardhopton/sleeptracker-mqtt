@@ -1,5 +1,4 @@
 import { IDeviceData } from '@ha/IDeviceData';
-import { Entity } from '@ha/base/Entity';
 import { Dictionary } from '@utils/Dictionary';
 import { Timer } from '@utils/Timer';
 import { loopWithWait } from '@utils/loopWithWait';
@@ -9,7 +8,7 @@ import { IController } from '../Common/IController';
 import { IEventSource } from '../Common/IEventSource';
 
 export class BLEController<TCommand> extends EventEmitter implements IEventSource, IController<TCommand> {
-  entities: Dictionary<Entity> = {};
+  cache: Dictionary<Object> = {};
   get notifyNames() {
     return Object.keys(this.notifyHandles);
   }

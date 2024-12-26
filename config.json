@@ -59,7 +59,8 @@
       {
         "name": "LINAK Bed 0123",
         "friendlyName": "Linak Bed",
-        "hasMassage": true
+        "hasMassage": true,
+        "motorCount": 2
       }
     ],
     "solaceDevices": [
@@ -156,7 +157,8 @@
       {
         "name": "str",
         "friendlyName": "str",
-        "hasMassage": "bool?"
+        "hasMassage": "bool?",
+        "motorCount": "int?"
       }
     ],
     "solaceDevices": [

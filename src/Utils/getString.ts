@@ -3,7 +3,8 @@ import { Dictionary } from './Dictionary';
 let strings: Dictionary<string> = {};
 
 export const loadStrings = async (language = 'en') => {
-  strings = await import(`../Strings/${language}`);
+  const imported = await import(`../Strings/${language}`);
+  strings = imported.default ? imported.default : imported;
 };
 
 export type StringsKey = keyof typeof Strings;

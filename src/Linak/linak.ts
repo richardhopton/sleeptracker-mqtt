@@ -11,6 +11,7 @@ import { BedPositionSensor } from './entities/BedPositionSensor';
 import { getDevices } from './options';
 import { setupLightEntities } from './setupLightsEntities';
 import { setupMassageButtons } from './setupMassageButtons';
+import { setupMotorEntities } from './setupMotorEntities';
 import { setupPresetButtons } from './setupPresetButtons';
 
 export const linak = async (mqtt: IMQTTConnection, esphome: IESPConnection) => {
@@ -42,6 +43,7 @@ export const linak = async (mqtt: IMQTTConnection, esphome: IESPConnection) => {
       continue;
     }
 
+    const { motorCount = 2 } = device;
     const notifyHandles: Dictionary<number> = {};
     const outputService = services.find((s) => s.uuid === '99fa0020-338a-1024-8a49-009c0215f78a');
     if (outputService) {
@@ -55,19 +57,18 @@ export const linak = async (mqtt: IMQTTConnection, esphome: IESPConnection) => {
       );
       if (legCharacteristic) notifyHandles['leg'] = legCharacteristic.handle;
 
-      // const { motorCount = 2 } = device;
-      // if (motorCount > 2) {
-      //   const headCharacteristic = outputService.characteristicsList.find(
-      //     (c) => c.uuid === '99fa0026-338a-1024-8a49-009c0215f78a'
-      //   );
-      //   if (headCharacteristic) outputHandles['head'] = headCharacteristic.handle;
-      // }
-      // if (motorCount > 3) {
-      //   const feetCharacteristic = outputService.characteristicsList.find(
-      //     (c) => c.uuid === '99fa0025-338a-1024-8a49-009c0215f78a'
-      //   );
-      //   if (feetCharacteristic) outputHandles['feet'] = feetCharacteristic.handle;
-      // }
+      if (motorCount > 2) {
+        const headCharacteristic = outputService.characteristicsList.find(
+          (c) => c.uuid === '99fa0026-338a-1024-8a49-009c0215f78a'
+        );
+        if (headCharacteristic) notifyHandles['head'] = headCharacteristic.handle;
+      }
+      if (motorCount > 3) {
+        const feetCharacteristic = outputService.characteristicsList.find(
+          (c) => c.uuid === '99fa0025-338a-1024-8a49-009c0215f78a'
+        );
+        if (feetCharacteristic) notifyHandles['feet'] = feetCharacteristic.handle;
+      }
     }
     const isAdvanced = !!outputService;
     const controller = new BLEController(
@@ -82,21 +83,30 @@ export const linak = async (mqtt: IMQTTConnection, esphome: IESPConnection) => {
 
     if (hasMassage) setupMassageButtons(mqtt, controller);
 
+    setupMotorEntities(mqtt, controller, motorCount);
+
+    const deviceInfo = await bleDevice.getDeviceInfo();
+    if (deviceInfo) setupDeviceInfoSensor(mqtt, controller, deviceInfo);
+
     if (!isAdvanced) continue;
     setupPresetButtons(mqtt, controller);
 
     const mapPositionData = (data: Uint8Array) => (data[1] << 8) | data[0];
+    if (notifyHandles.head) {
+      const headPositionSensor = new BedPositionSensor(mqtt, deviceData, buildEntityConfig('AngleHead'), 820, 68);
+      controller.on('head', (data) => headPositionSensor.setPosition(mapPositionData(data)));
+    }
     if (notifyHandles.back) {
       const backPositionSensor = new BedPositionSensor(mqtt, deviceData, buildEntityConfig('AngleBack'), 820, 68);
       controller.on('back', (data) => backPositionSensor.setPosition(mapPositionData(data)));
     }
-
     if (notifyHandles.leg) {
       const legPositionSensor = new BedPositionSensor(mqtt, deviceData, buildEntityConfig('AngleLeg'), 548, 45);
       controller.on('leg', (data) => legPositionSensor.setPosition(mapPositionData(data)));
     }
-
-    const deviceInfo = await bleDevice.getDeviceInfo();
-    if (deviceInfo) setupDeviceInfoSensor(mqtt, controller, deviceInfo);
+    if (notifyHandles.feet) {
+      const feetPositionSensor = new BedPositionSensor(mqtt, deviceData, buildEntityConfig('AngleFoot'), 548, 45);
+      controller.on('feet', (data) => feetPositionSensor.setPosition(mapPositionData(data)));
+    }
   }
 };

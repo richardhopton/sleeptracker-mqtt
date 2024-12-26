@@ -5,16 +5,10 @@ import { IController } from 'Common/IController';
 import { IEventSource } from 'Common/IEventSource';
 import { Commands } from './Commands';
 
-interface MassageEntities {
-  massageHead?: Select;
-  massageFoot?: Select;
-  massageWave?: Select;
-}
-
-export const setupMassageEntities = (mqtt: IMQTTConnection, controller: IController<number[]> & IEventSource) => {
-  const { deviceData, entities, writeCommand } = controller;
-  const cache = entities as MassageEntities;
-
+export const setupMassageEntities = (
+  mqtt: IMQTTConnection,
+  { deviceData, cache, writeCommand, on }: IController<number[]> & IEventSource
+) => {
   if (!cache.massageHead) {
     const options = [getString('Off'), getString('Low'), getString('Medium'), getString('High')];
     const select = (cache.massageHead = new Select(
@@ -29,8 +23,8 @@ export const setupMassageEntities = (mqtt: IMQTTConnection, controller: IControl
         await writeCommand(Commands.MassageHeadStrength(index));
         return state;
       }
-    ));
-    controller.on('read', (data: Uint8Array) => {
+    ).setOnline());
+    on('read', (data: Uint8Array) => {
       const head = data[2] - 0x40;
       if ((head & 0x80) === 0x0) {
         select.setState(options[0]);
@@ -40,7 +34,6 @@ export const setupMassageEntities = (mqtt: IMQTTConnection, controller: IControl
       }
     });
   }
-  cache.massageHead.setOnline();
 
   if (!cache.massageFoot) {
     const options = [getString('Off'), getString('Low'), getString('Medium'), getString('High')];
@@ -56,8 +49,8 @@ export const setupMassageEntities = (mqtt: IMQTTConnection, controller: IControl
         await writeCommand(Commands.MassageFootStrength(index));
         return state;
       }
-    ));
-    controller.on('read', (data: Uint8Array) => {
+    ).setOnline());
+    on('read', (data: Uint8Array) => {
       const foot = data[3] - 0x40;
       if ((foot & 0x80) === 0x0) {
         select.setState(options[0]);
@@ -67,7 +60,6 @@ export const setupMassageEntities = (mqtt: IMQTTConnection, controller: IControl
       }
     });
   }
-  cache.massageFoot.setOnline();
 
   if (!cache.massageWave) {
     const options = [getString('Off'), '1', '2', '3'];
@@ -89,8 +81,8 @@ export const setupMassageEntities = (mqtt: IMQTTConnection, controller: IControl
         }
         return state;
       }
-    ));
-    controller.on('read', (data: Uint8Array) => {
+    ).setOnline());
+    on('read', (data: Uint8Array) => {
       const wave = data[0];
       if ((wave & 0x2) === 0x2) {
         select.setState(options[0]);
